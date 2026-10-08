@@ -2,8 +2,9 @@
 #include <stdlib.h>
 #include <locale.h>
 #include <windows.h>
+#include <time.h>
 
-// --- DEFINIÇÃO DE CORES ANSI ---
+// --- Definição de CORES ANSI ---
 #define COR_RESET    "\033[0m"
 #define COR_VERMELHO "\033[1;31m"
 #define COR_VERDE    "\033[1;32m"
@@ -11,7 +12,7 @@
 #define COR_AZUL     "\033[1;34m"
 #define COR_CYAN     "\033[1;36m"
 
-// --- PROTÓTIPOS DAS FUNÇÕES ---
+// --- PROTOTIPOS DAS FUNÇÕES ---
 void limparTela(void);
 void exibirMenu(void);
 void exibirSobre(void);
@@ -32,7 +33,7 @@ void exibirSobre(void) {
 	printf(COR_AMARELO "             SOBRE O JOGO               \n" COR_RESET);
 	printf(COR_CYAN "=========================================\n" COR_RESET);
 	printf("Jogo da Forca desenvolvido em Linguagem C.\n");
-	printf("Desenvolvido no âmbito da UFCD 0809.\n");
+	printf("Desenvolvido no âmbito da UFCD 00606.\n");
 	printf(COR_CYAN "=========================================\n\n" COR_RESET);
 
 	printf("Pressione ENTER para voltar ao menu...");
@@ -75,7 +76,7 @@ void exibirMenu(void) {
 				break;
 			case 3:
 				limparTela();
-				printf(COR_AMARELO "Obrigado por jogar! Até à próxima.\n" COR_RESET);
+				printf(COR_AMARELO "Obrigado por jogar! Até a prxima.\n" COR_RESET);
 				break;
 			default:
 				printf(COR_VERMELHO "\nOpção inválida! Tente novamente.\n" COR_RESET);
@@ -87,13 +88,21 @@ void exibirMenu(void) {
 	} while (opcao != 3);
 }
 
-// --- FUN��O PRINCIPAL ---
+// --- FUNÇÃO PRINCIPAL ---
 int main(void) {
-    // Configura o terminal do Windows para UTF-8 (corrige os acentos)
-    SetConsoleOutputCP(65001);
+    // Define a localização do sistema para português
+    setlocale(LC_ALL, "Portuguese");
 
-    // Inicia o fluxo chamando o menu
+#ifdef _WIN32
+    // Configura a consola do Windows para UTF-8
+    SetConsoleOutputCP(65001);
+#endif
+
+    // Inicializa a semente para sorteios aleatórios reais
+    srand(time(NULL));
+
     exibirMenu();
 
     return 0;
 }
+
