@@ -12,9 +12,10 @@
 #define COR_RESET   "\033[0m"
 #define COR_CYAN    "\033[1;36m" // Ciano brilhante
 #define COR_AMARELO "\033[1;33m" // Amarelo brilhante
-#define COR_VERDE    "\033[1;32m"
+#define COR_VERDE    "\033[1;32m" //verde
 #define COR_DICA    "\033[1;35m" // Magenta brilhante
 #define COR_SUCESSO "\033[1;32m" // Verde brilhante
+#define COR_TITULO_ROSA "\033[30;45m" // Texto preto, fundo rosa
 
 // --- ESTRUTURA DO JOGO ---
 typedef struct {
@@ -48,7 +49,7 @@ void limparTela(void) {
 #endif
 }
 
-// --- LÓGICA DO JOGO (ETAPA 2 & PREPARAÇÃO PARA ETAPA 3) ---
+// --- LÓGICA COMPLETA DO JOGO (ETAPA 3) ---
 void iniciarJogo(void) {
     limparTela();
 
@@ -69,22 +70,100 @@ void iniciarJogo(void) {
     }
     mascara[tamanho] = '\0'; // Finaliza a string em C
 
-    printf(COR_CYAN "=== JOGO DA FORCA - MUSICA & CANTORES ===\n\n" COR_RESET);
-    printf(COR_DICA "Dica: %s\n\n" COR_RESET, jogoAtual.dica);
+    // Variáveis de controlo do jogo
+    int tentativasRestantes = 6;
+    char letrasArriscadas[30] = ""; // Guarda as letras já digitadas
+    int totalArriscadas = 0;
+    int ganhou = 0;
 
-    // Exibe a máscara formatada com espaços entre os caracteres
-    printf("Palavra: ");
-    for (int i = 0; i < tamanho; i++) {
-        printf("%c ", mascara[i]);
+    // --- CICLO PRINCIPAL DO JOGO ---
+    while (tentativasRestantes > 0 && !ganhou) {
+        limparTela();
+
+        printf(COR_TITULO_ROSA " === JOGO DA FORCA - MUSICA & CANTORES === " COR_RESET "\n\n");
+        printf(COR_DICA "Dica: %s\n" COR_RESET, jogoAtual.dica);
+        printf("Tentativas restantes: %d\n", tentativasRestantes);
+
+        // Exibe as letras já arriscadas
+        printf("Letras tentadas: ");
+        for (int i = 0; i < totalArriscadas; i++) {
+            printf("%c ", letrasArriscadas[i]);
+        }
+        printf("\n\n");
+
+        // Exibe a palavra mascarada (com espaços entre os caracteres)
+        printf("Palavra: ");
+        for (int i = 0; i < tamanho; i++) {
+            printf("%c ", mascara[i]);
+        }
+        printf("\n\n");
+
+        // Pede a letra ao jogador
+        char letra;
+        printf("Digite uma letra: ");
+        scanf(" %c", &letra);
+
+        // Converte a letra digitada para maiúscula
+        if (letra >= 'a' && letra <= 'z') {
+            letra = letra - 32;
+        }
+
+        // Verifica se a letra já foi tentada antes
+        int jaTentou = 0;
+        for (int i = 0; i < totalArriscadas; i++) {
+            if (letrasArriscadas[i] == letra) {
+                jaTentou = 1;
+                break;
+            }
+        }
+
+        if (jaTentou) {
+            printf("\nVoce ja tentou a letra '%c'! Tente outra.\n", letra);
+            getchar();
+            getchar();
+            continue; // Volta ao início do ciclo sem gastar tentativa
+        }
+
+        // Adiciona a letra ao histórico de tentativas
+        letrasArriscadas[totalArriscadas] = letra;
+        totalArriscadas++;
+
+        // Verifica se a letra existe na palavra do cantor
+        int acertou = 0;
+        for (int i = 0; i < tamanho; i++) {
+            if (jogoAtual.palavra[i] == letra) {
+                mascara[i] = letra; // Revela a letra na máscara
+                acertou = 1;
+            }
+        }
+
+        // Se errou a letra, perde uma tentativa
+        if (!acertou) {
+            tentativasRestantes--;
+        }
+
+        // Verifica se o jogador completou todas as letras (se já não há '_')
+        if (strchr(mascara, '_') == NULL) {
+            ganhou = 1;
+        }
     }
-    printf("\n\n");
 
-    // --- MENSAGEM DO LINK (TEXTO NORMAL, SEM COR) ---
-    printf("Neste link voce consegue acessar os sucessos desse grande artista, aproveite! \n");
-    printf("Playlist: %s\n\n", jogoAtual.link);
+    // --- FIM DO JOGO: VITÓRIA OU DERROTA ---
+    limparTela();
+        printf(COR_TITULO_ROSA " === JOGO DA FORCA - MUSICA & CANTORES === " COR_RESET "\n\n");
+
+    if (ganhou) {
+        printf(COR_AMARELO "PARABENS! VOCE ACERTOU A PALAVRA: %s\n\n" COR_RESET, jogoAtual.palavra);
+        // Tua mensagem sem cor e a playlist
+        printf("Neste link voce consegue acessar os sucessos desse grande artista, aproveite ;) \n");
+        printf("Playlist: %s\n\n", jogoAtual.link);
+    } else {
+        printf("GAME OVER! Voce esgotou as suas tentativas.\n");
+        printf("O artista era: %s\n\n", jogoAtual.palavra);
+    }
 
     printf("Pressione Enter para voltar ao menu...");
-    getchar(); // Consome o Enter pendente
+    getchar(); // Consome a quebra de linha do scanf
     getchar();
 }
 
