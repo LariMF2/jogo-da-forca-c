@@ -8,14 +8,14 @@
 #include <windows.h>
 #endif
 
-// --- DEFINI√á√ÉO DE CORES ANSI ---
-#define COR_RESET   "\033[0m"
-#define COR_CYAN    "\033[1;36m" // Ciano brilhante
-#define COR_AMARELO "\033[1;33m" // Amarelo brilhante
-#define COR_VERDE    "\033[1;32m" //verde
-#define COR_DICA    "\033[1;35m" // Magenta brilhante
-#define COR_SUCESSO "\033[1;32m" // Verde brilhante
+// --- DEFINI«√O DE CORES ANSI ---
+#define COR_RESET       "\033[0m"
+#define COR_CYAN        "\033[1;36m" // Ciano brilhante
+#define COR_AMARELO     "\033[1;33m" // Amarelo brilhante
+#define COR_VERDE       "\033[1;32m" // Verde brilhante
+#define COR_DICA        "\033[1;35m" // Magenta brilhante
 #define COR_TITULO_ROSA "\033[30;45m" // Texto preto, fundo rosa
+#define COR_VERMELHO    "\033[1;31m" // Vermelho brilhante
 
 // --- ESTRUTURA DO JOGO ---
 typedef struct {
@@ -34,13 +34,14 @@ ElementoJogo listaArtistas[] = {
 
 int totalPalavras = sizeof(listaArtistas) / sizeof(listaArtistas[0]);
 
-// --- PROT√ìTIPOS DAS FUN√á√ïES ---
+// --- PROT”TIPOS DAS FUN«’ES ---
+void exibirForca(int erros);
 void limparTela(void);
 void exibirMenu(void);
 void exibirSobre(void);
 void iniciarJogo(void);
 
-// --- FUN√á√ÉO PARA LIMPAR O ECR√É ---
+// --- FUN«√O PARA LIMPAR O ECR√ ---
 void limparTela(void) {
 #ifdef _WIN32
     system("cls");
@@ -49,7 +50,30 @@ void limparTela(void) {
 #endif
 }
 
-// --- L”GICA COMPLETA DO JOGO (ETAPA 3) ---
+// --- FUN«√O PARA EXIBIR A FORCA EM ASCII ---
+void exibirForca(int erros) {
+    printf(COR_CYAN);
+    printf("  +---+\n");
+    printf("  |   |\n");
+    
+    if (erros >= 1) printf("  O   |\n");
+    else           printf("      |\n");
+
+    if (erros == 2)      printf("  |   |\n");
+    else if (erros == 3) printf(" /|   |\n");
+    else if (erros >= 4) printf(" /|\\  |\n");
+    else                 printf("      |\n");
+
+    if (erros == 5)      printf(" /    |\n");
+    else if (erros >= 6) printf(" / \\  |\n");
+    else                 printf("      |\n");
+
+    printf("      |\n");
+    printf("=========\n\n");
+    printf(COR_RESET);
+}
+
+// --- L”GICA COMPLETA DO JOGO ---
 void iniciarJogo(void) {
     limparTela();
 
@@ -80,7 +104,13 @@ void iniciarJogo(void) {
     while (tentativasRestantes > 0 && !ganhou) {
         limparTela();
 
+        // 1. TÌtulo em primeiro lugar
         printf(COR_TITULO_ROSA " === JOGO DA FORCA - MUSICA & CANTORES === " COR_RESET "\n\n");
+
+        // 2. Desenho da forca
+        int erros = 6 - tentativasRestantes;
+        exibirForca(erros);
+
         printf(COR_DICA "Dica: %s\n" COR_RESET, jogoAtual.dica);
         printf("Tentativas restantes: %d\n", tentativasRestantes);
 
@@ -150,15 +180,16 @@ void iniciarJogo(void) {
 
     // --- FIM DO JOGO: VIT”RIA OU DERROTA ---
     limparTela();
-        printf(COR_TITULO_ROSA " === JOGO DA FORCA - MUSICA & CANTORES === " COR_RESET "\n\n");
+    printf(COR_TITULO_ROSA " === JOGO DA FORCA - MUSICA & CANTORES === " COR_RESET "\n\n");
 
     if (ganhou) {
         printf(COR_AMARELO "PARABENS! VOCE ACERTOU A PALAVRA: %s\n\n" COR_RESET, jogoAtual.palavra);
         // Tua mensagem sem cor e a playlist
         printf("Neste link voce consegue acessar os sucessos desse grande artista, aproveite ;) \n");
         printf("Playlist: %s\n\n", jogoAtual.link);
-    } else {
-        printf("GAME OVER! Voce esgotou as suas tentativas.\n");
+   } else {
+        exibirForca(6); // Exibe a forca completa com o boneco enforcado
+        printf(COR_VERMELHO "GAME OVER! Voce esgotou as suas tentativas!\n" COR_RESET);
         printf("O artista era: %s\n\n", jogoAtual.palavra);
     }
 
@@ -167,7 +198,7 @@ void iniciarJogo(void) {
     getchar();
 }
 
-// --- EXIBI√á√ÉO DA TELA "SOBRE" ---
+// --- EXIBI«√O DA TELA "SOBRE" ---
 void exibirSobre(void) {
     limparTela();
     printf(COR_CYAN "=============================================\n" COR_RESET);
@@ -222,7 +253,7 @@ void exibirMenu(void) {
     } while (opcao != 3);
 }
 
-// --- FUN√á√ÉO PRINCIPAL ---
+// --- FUN«√O PRINCIPAL ---
 int main(void) {
     setlocale(LC_ALL, "Portuguese");
 
@@ -230,11 +261,10 @@ int main(void) {
     SetConsoleOutputCP(65001);
 #endif
 
-    // Inicializa a semente para sorteios aleat√≥rios reais
+    // Inicializa a semente para sorteios aleatÛrios reais
     srand(time(NULL));
 
     exibirMenu();
 
     return 0;
 }
-
