@@ -24,7 +24,7 @@ typedef struct {
     char link[150];
 } ElementoJogo;
 
-// --- BANCO DE DADOS DOS TEUS 4 CANTORES ---
+// --- BANCO DE DADOS DOS 4 CANTORES ---
 ElementoJogo listaArtistas[] = {
     {"ANITTA", "Cantora Pop Brasileira", "https://www.youtube.com/watch?v=kR2A26sJm-c"},
     {"GAL COSTA", "Icone da MPB e Tropicalia", "https://www.youtube.com/watch?v=1u4vJ4UakB4"},
@@ -184,7 +184,7 @@ void iniciarJogo(void) {
 
     if (ganhou) {
         printf(COR_AMARELO "PARABENS! VOCE ACERTOU A PALAVRA: %s\n\n" COR_RESET, jogoAtual.palavra);
-        // Tua mensagem sem cor e a playlist
+        // mensagem sem cor e a playlist
         printf("Neste link voce consegue acessar os sucessos desse grande artista, aproveite ;) \n");
         printf("Playlist: %s\n\n", jogoAtual.link);
    } else {
